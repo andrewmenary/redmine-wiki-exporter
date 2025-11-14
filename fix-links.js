@@ -36,16 +36,27 @@ function processMarkdownFile(filePath) {
   const currentProject = path.basename(path.dirname(filePath));
 
   // Convert Redmine wiki link syntax [[Page Name]] to markdown [Page Name](Page_Name.md)
+  // Also handles [[Page Name|Display Text]] format
   content = content.replace(/\[\[([^\]]+)\]\]/g, (match, pageName) => {
+    // Check if it has a pipe separator for custom display text
+    let displayText = pageName;
+    let actualPage = pageName;
+    
+    if (pageName.includes('|')) {
+      const parts = pageName.split('|', 2);
+      actualPage = parts[0].trim();
+      displayText = parts[1].trim();
+    }
+    
     // Check if it's a cross-project link: [[project:page]]
-    if (pageName.includes(':')) {
-      const [project, page] = pageName.split(':', 2);
+    if (actualPage.includes(':')) {
+      const [project, page] = actualPage.split(':', 2);
       const pageFile = page.replace(/\s+/g, '_');
-      return `[${page}](../${project}/${pageFile}.md)`;
+      return `[${displayText}](../${project}/${pageFile}.md)`;
     } else {
       // Local page link
-      const pageFile = pageName.replace(/\s+/g, '_');
-      return `[${pageName}](${pageFile}.md)`;
+      const pageFile = actualPage.replace(/\s+/g, '_');
+      return `[${displayText}](${pageFile}.md)`;
     }
   });
 
