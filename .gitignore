@@ -1,2 +1,4 @@
 node_modules/
+output/
 config.json
+projects-metadata.json
