@@ -38,14 +38,13 @@ Alternatively, the project is now ready for **Docker**!
 
 ## Dockerized
 
-This app is ready for running in a Docker container. Since you will want the output to be shared
-with the host machine, if you are running on Windows try this run command:
+This app is ready for running in a Docker container.
 
 To build the Docker image, run:
 ```
 docker build -t redmine-wiki-exporter .
 ```
-Then to run it with the output mounted to your host machine:
+Since you will want the output to be shared with the host machine, if you are running on Windows try this run command:
 ```
 docker run -v ${PWD}/output:/app/output redmine-wiki-exporter
 ```
