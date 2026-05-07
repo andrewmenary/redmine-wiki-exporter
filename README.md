@@ -1,5 +1,32 @@
 
-A simple script to export all wiki pages and their attachments of a Redmine server.
+A simple script to export all wiki pages and their attachments from a [Redmine](https://www.redmine.org/) server.
+
+## Fork / Divergence from Upstream
+
+This repository is a fork of [dmichel35/redmine-wiki-exporter](https://github.com/dmichel35/redmine-wiki-exporter)
+(original work by David Michel, 2016). The following changes have been made beyond the upstream code:
+
+**Dockerization**
+- Added `Dockerfile` (based on `node:20`) and `.dockerignore`.
+- The Docker `CMD` runs all three scripts in sequence: `main.js`, `fix-links.js`, `create-indexes.js`.
+- README updated with `docker build` / `docker run` instructions, including a Windows-compatible volume-mount example.
+
+**New post-processing scripts**
+- `fix-links.js` — rewrites Redmine wiki-link syntax (`[[Page]]`, `[[Page|Display]]`, `[[project:page]]`) and absolute attachment URLs in exported Markdown files to relative paths, making the output viewable on GitHub.
+- `create-indexes.js` — generates a per-project `Index.md` (using the best-matching wiki page) and a root-level `Index.md` linking all projects alphabetically.
+
+**Reliability improvements to `main.js`**
+- Added a `Throttle` class to cap API requests at 50/min (1 request per 1200 ms).
+- Added `retryRequest` with exponential backoff (up to 5 retries) to handle `ECONNREFUSED`, `ECONNRESET`, HTTP 429, and HTTP 503.
+- Improved HTTP error messages (401 now prints a credential hint; unexpected status codes are logged explicitly).
+- `getProjects` now also saves `output/projects-metadata.json` (used by `create-indexes.js`).
+
+**Security**
+- `config.json` removed from version control; `config.json.sample` provided as a template.
+- `config.json` added to `.gitignore` to prevent accidental credential commits.
+
+**Bugfixes**
+- `fix-links.js`: Correctly handles `[[Page Name|Display Name]]` Redmine wiki links — the page name and display text are now split properly and the display text is used as the Markdown link label.
 
 ## Requirements:
 
